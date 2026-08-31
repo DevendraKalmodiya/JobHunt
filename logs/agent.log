@@ -1,0 +1,91 @@
+[00:40:08] Agent starting...
+[00:41:15] Agent starting...
+[00:41:48] Agent starting...
+[00:41:50] Parsing resume PDF...
+[00:41:50] AFC is enabled with max remote calls: 10.
+[00:41:50] Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+[00:41:51] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 404 Not Found"
+[00:49:55] Agent starting...
+[00:49:56] Parsing resume PDF...
+[00:49:56] AFC is enabled with max remote calls: 10.
+[00:49:56] Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+[00:50:13] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent "HTTP/1.1 200 OK"
+[00:50:13] Resume loaded for: DEVENDRA KALMODIYA
+[00:52:37] LinkedIn session validated.
+[00:52:37] Searching: Software Engineer in India
+[00:52:47] Agent execution finished cleanly.
+[12:26:00] Agent starting...
+[12:26:02] Parsing resume PDF...
+[12:26:03] AFC is enabled with max remote calls: 10.
+[12:26:03] Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+[12:26:03] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent "HTTP/1.1 404 Not Found"
+[12:26:03] Failed to parse resume via Gemini: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
+[12:26:03] Resume loaded for: 
+[12:26:27] LinkedIn session validated.
+[12:26:27] Searching: Software Engineer in India
+[12:26:58] Skipping already processed job: Unknown at Unknown
+[12:27:07] Skipping already processed job: Unknown at Unknown
+[12:27:15] Skipping already processed job: Unknown at Unknown
+[12:27:22] Skipping already processed job: Unknown at Unknown
+[12:27:47] Skipping already processed job: Unknown at Unknown
+[12:27:54] Skipping already processed job: Unknown at Unknown
+[12:27:54] Searching: Software Engineer in Remote
+[12:28:14] Skipping already processed job: Unknown at Unknown
+[12:28:20] Skipping already processed job: Unknown at Unknown
+[12:28:30] Skipping already processed job: Unknown at Unknown
+[12:28:39] Skipping already processed job: Unknown at Unknown
+[12:28:48] Skipping already processed job: Unknown at Unknown
+[12:28:56] Skipping already processed job: Unknown at Unknown
+[12:29:03] Skipping already processed job: Unknown at Unknown
+[12:29:03] Searching: Software Developer in India
+[12:29:19] Skipping already processed job: Unknown at Unknown
+[12:29:26] Skipping already processed job: Unknown at Unknown
+[12:29:33] Skipping already processed job: Unknown at Unknown
+[12:29:39] Skipping already processed job: Unknown at Unknown
+[12:29:44] Skipping already processed job: Unknown at Unknown
+[12:29:50] Skipping already processed job: Unknown at Unknown
+[12:29:56] Skipping already processed job: Unknown at Unknown
+[12:29:56] Searching: Software Developer in Remote
+[12:30:13] Skipping already processed job: Unknown at Unknown
+[12:30:19] Skipping already processed job: Unknown at Unknown
+[12:30:25] Skipping already processed job: Unknown at Unknown
+[12:30:40] Skipping already processed job: Unknown at Unknown
+[12:30:52] Skipping already processed job: Unknown at Unknown
+[12:30:58] Skipping already processed job: Unknown at Unknown
+[12:31:10] Skipping already processed job: Unknown at Unknown
+[12:31:10] Searching: AI Engineer in India
+[12:31:30] Skipping already processed job: Unknown at Unknown
+[12:31:37] Skipping already processed job: Unknown at Unknown
+[12:31:42] Skipping already processed job: Unknown at Unknown
+[12:31:48] Skipping already processed job: Unknown at Unknown
+[12:31:54] Skipping already processed job: Unknown at Unknown
+[12:32:00] Skipping already processed job: Unknown at Unknown
+[12:32:09] Skipping already processed job: Unknown at Unknown
+[12:32:09] Searching: AI Engineer in Remote
+[12:32:28] Skipping already processed job: Unknown at Unknown
+[12:32:34] Skipping already processed job: Unknown at Unknown
+[12:32:42] Skipping already processed job: Unknown at Unknown
+[12:32:49] Skipping already processed job: Unknown at Unknown
+[12:32:55] Skipping already processed job: Unknown at Unknown
+[12:33:03] Skipping already processed job: Unknown at Unknown
+[12:33:10] Skipping already processed job: Unknown at Unknown
+[12:33:10] Searching: Machine Learning Engineer in India
+[12:33:30] Skipping already processed job: Unknown at Unknown
+[12:33:36] Skipping already processed job: Unknown at Unknown
+[12:33:38] Emergency Stop (Ctrl+C) triggered by user.
+[12:33:41] Agent execution finished cleanly.
+[12:51:39] Agent starting...
+[12:51:40] Parsing resume PDF...
+[12:51:40] AFC is enabled with max remote calls: 10.
+[12:51:40] Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+[12:52:28] HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent "HTTP/1.1 200 OK"
+[12:52:28] Resume loaded for: Devendra Kalmodiya
+[12:52:39] LinkedIn session validated.
+[12:52:39] Searching: Software Engineer in India
+[12:53:45] Searching: Software Engineer in Remote
+[12:54:10] Skipping already processed job: Unknown at Unknown
+[12:54:25] Emergency Stop (Ctrl+C) triggered by user.
+[13:02:01] Task was destroyed but it is pending!
+task: <Task pending name='Task-126' coro=<BrowserContext.close() running at D:\Medicaps notes\6th sem\Mini Project\Job application automation\venv\Lib\site-packages\playwright\_impl\_browser_context.py:575> cb=[SyncBase._sync.<locals>.<lambda>() at D:\Medicaps notes\6th sem\Mini Project\Job application automation\venv\Lib\site-packages\playwright\_impl\_sync_base.py:111]>
+[13:02:01] Task was destroyed but it is pending!
+task: <Task pending name='Task-125' coro=<Locator.is_visible() running at D:\Medicaps notes\6th sem\Mini Project\Job application automation\venv\Lib\site-packages\playwright\_impl\_locator.py:553> wait_for=<Future pending cb=[Task.task_wakeup()]> cb=[SyncBase._sync.<locals>.<lambda>() at D:\Medicaps notes\6th sem\Mini Project\Job application automation\venv\Lib\site-packages\playwright\_impl\_sync_base.py:111, ProtocolCallback.__init__.<locals>.cb() at D:\Medicaps notes\6th sem\Mini Project\Job application automation\venv\Lib\site-packages\playwright\_impl\_connection.py:264]>

@@ -1,0 +1,52 @@
+{
+  "target_roles": [
+    "Software Engineer",
+    "Software Developer",
+    "AI Engineer",
+    "Machine Learning Engineer",
+    "Data Engineer",
+    "Product Manager",
+    "Project Manager",
+    "AI Engineer",
+"AI/ML Engineer",
+"Machine Learning Engineer",
+"Applied AI Engineer",
+"Software Engineer",
+"Software Engineer - AI/ML",
+"Full Stack Engineer",
+"Full Stack Developer",
+"Backend Engineer",
+"Generative AI Engineer",
+
+"Product Engineer",
+"AI Product Engineer",
+"Data/ML Engineer",
+"Frontend Engineer",
+"Software Developer",
+"Associate Software Engineer",
+"Graduate Software Engineer",
+"SDE Intern",
+"AI Engineer Intern",
+"ML Engineer Intern",
+
+"Technical Product Manager",
+"AI Product Manager",
+"Associate Product Manager",
+"Technical Project Manager",
+"Program Manager - Technology"
+  ],
+  "locations": [
+    "India",
+    "Remote"
+  ],
+  "minimum_salary_lpa": 3.0,
+  "minimum_match_score": 60,
+  "maximum_jobs_to_scan": 300,
+  "auto_submit": true,
+  "dry_run": false,
+  "skip_if_salary_unknown": false,
+  "headless": false,
+  "exclusion_keywords": [
+    "3+ years of Experience"
+  ]
+}
