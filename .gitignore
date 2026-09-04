@@ -66,3 +66,39 @@ dist/
 # =========================
 *.tmp
 *.temp
+
+# =========================
+# Browser / Playwright Profiles
+# =========================
+browser_profile/
+playwright_profile/
+chrome_profile/
+
+# =========================
+# Playwright Test Artifacts
+# =========================
+test-results/
+playwright-report/
+blob-report/
+
+# =========================
+# Screenshots / Debug Files
+# =========================
+screenshots/
+debug/
+*.png
+*.jpg
+*.jpeg
+
+# =========================
+# Personal Documents
+# =========================
+*.pdf
+*.doc
+*.docx
+
+# =========================
+# Generated Application Data
+# =========================
+data/skipped_jobs.json
+data/applications.json

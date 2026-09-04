@@ -77,6 +77,10 @@ class StorageManager:
             json.dump(apps, f, indent=2)
 
     def record_skipped(self, title: str, company: str, url: str, reason: str, job_id: str = ""):
+        # Do not persist invalid Unknown records to prevent false-positive skips later
+        if title == "Unknown" and company == "Unknown":
+            return
+
         skipped = self.load_skipped()
         record = {
             "job_id": job_id,
