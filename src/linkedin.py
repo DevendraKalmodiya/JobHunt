@@ -295,7 +295,7 @@ class LinkedInEngine:
             detection = self.detect_easy_apply_button(run_diagnostics=True)
 
             if detection["is_external_apply"]:
-                print("  [-] External Apply detected (Redirects off-site). Skipping auto-application.")
+                print("  [-] External Apply detected. Skipping auto-application.")
                 return False
 
             if not detection["is_easy_apply"] or not detection["button_handle"]:
@@ -304,38 +304,102 @@ class LinkedInEngine:
 
             print(f"  [+] Easy Apply button located using: {detection['strategy']}")
             apply_btn = detection["button_handle"]
-            
-            # Click application trigger (may cause page navigation for <a> links)
             apply_btn.click()
             time.sleep(3)
 
-            # Form Modal & Full-Page Flow Interaction Loop
-            for step in range(12):
+            application_submitted = False
+
+            # Form Modal Flow Interaction Loop (Up to 15 form steps/pages)
+            for step in range(15):
                 if not self.is_browser_alive():
                     return False
 
-                # Handle Done / Completion
-                done_btn = self.page.locator("button[aria-label='Dismiss'], button:has-text('Done'), a:has-text('Done')").first
-                if done_btn.is_visible() and not self.page.locator("button:has-text('Submit application'), button:has-text('Submit')").is_visible():
-                    done_btn.click()
-                    return True
+                # --- STEP A: FILL ALL CURRENT PAGE INPUTS ---
+                
+                # 1. Fill Text, Numeric, and Textarea Inputs
+                try:
+                    inputs = self.page.locator("div.jobs-easy-apply-modal input[type='text'], div.jobs-easy-apply-modal input[type='number'], div.jobs-easy-apply-modal textarea").all()
+                    for inp in inputs:
+                        if inp.is_visible() and not inp.input_value():
+                            label_text = ""
+                            try:
+                                label_el = self.page.locator(f"label[for='{inp.get_attribute('id')}']").first
+                                if label_el.is_visible():
+                                    label_text = label_el.inner_text()
+                            except Exception:
+                                pass
+                            
+                            answer = "1"
+                            if any(k in label_text.lower() for k in ["mobile", "phone"]):
+                                answer = getattr(profile, 'phone', '9876543210')
+                            elif any(k in label_text.lower() for k in ["experience", "years"]):
+                                answer = "1"
+                            elif label_text:
+                                answer = gemini.generate_application_answer(label_text, profile, job) or "1"
 
-                # Submit Application
+                            inp.fill(str(answer))
+                            time.sleep(0.3)
+                except Exception:
+                    pass
+
+                # 2. Handle Unselected Radio Button Groups
+                try:
+                    fieldset_els = self.page.locator("div.jobs-easy-apply-modal fieldset").all()
+                    for fs in fieldset_els:
+                        if fs.is_visible():
+                            checked = fs.locator("input[type='radio']:checked").count()
+                            if checked == 0:
+                                yes_opt = fs.locator("label:has-text('Yes'), input[value='Yes']").first
+                                if yes_opt.is_visible():
+                                    yes_opt.click()
+                                else:
+                                    first_opt = fs.locator("label, input[type='radio']").first
+                                    if first_opt.is_visible():
+                                        first_opt.click()
+                                time.sleep(0.3)
+                except Exception:
+                    pass
+
+                # 3. Handle Unselected Dropdowns
+                try:
+                    selects = self.page.locator("div.jobs-easy-apply-modal select").all()
+                    for sel in selects:
+                        if sel.is_visible() and not sel.value():
+                            options = sel.locator("option").all()
+                            if len(options) > 1:
+                                val = options[1].get_attribute("value")
+                                if val:
+                                    sel.select_option(value=val)
+                                    time.sleep(0.3)
+                except Exception:
+                    pass
+
+                # --- STEP B: CHECK FOR SUBMISSION / NAVIGATION BUTTONS ---
+
+                # 1. Check for Final "Submit Application" Button FIRST
                 submit_btn = self.page.locator("button:has-text('Submit application'), button:has-text('Submit')").first
                 if submit_btn.is_visible():
                     submit_btn.click()
-                    time.sleep(2)
+                    time.sleep(3)
+                    application_submitted = True
+                    
+                    # Dismiss final post-submit dialog if present
+                    dismiss_btn = self.page.locator("button[aria-label='Dismiss'], button:has-text('Done'), a:has-text('Done')").first
+                    if dismiss_btn.is_visible():
+                        dismiss_btn.click()
                     return True
 
-                # Next / Continue Step
+                # 2. Check for "Next" or "Review" Button
                 next_btn = self.page.locator("button:has-text('Next'), button:has-text('Continue to application'), button:has-text('Review')").first
-                if next_btn.is_visible():
+                if next_btn.is_visible() and next_btn.is_enabled():
                     next_btn.click()
-                    time.sleep(2)
-                else:
-                    break
+                    time.sleep(2.5)  # Wait for next page DOM to render
+                    continue
 
-            return False
+                # 3. If modal closed unexpectedly or no navigation button is active, wait brief moment
+                time.sleep(1)
+
+            return application_submitted
         except Exception as e:
             print(f"  [-] Application step exception: {e}")
             return False
