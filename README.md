@@ -1,4 +1,4 @@
-# 🤖 Autonomous LinkedIn Easy Apply AI Agent
+# Autonomous LinkedIn Easy Apply AI Agent
 
 An **AI-powered autonomous job application agent** built with **Python, Playwright, and OpenAI-compatible LLM APIs**. The agent searches LinkedIn for relevant opportunities, evaluates candidate-job fit using generative AI, and automates multi-step **LinkedIn Easy Apply** workflows.
 
@@ -6,22 +6,22 @@ An **AI-powered autonomous job application agent** built with **Python, Playwrig
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
-### 🔎 Autonomous Job Discovery
+### Autonomous Job Discovery
 
 * Searches LinkedIn for jobs based on configured criteria.
 * Extracts job title, company, description, and other relevant metadata.
 * Evaluates opportunities against the candidate's resume/profile before applying.
 
-### 🧠 Multi-Provider LLM Fallback Router
+### Multi-Provider LLM Fallback Router
 
 * Uses a hierarchical inference strategy:
   **Groq → OpenRouter → Local Ollama**
 * Automatically falls back to another provider when an upstream provider encounters rate limits, quota issues, or availability problems.
 * Uses the **OpenAI SDK** for a consistent interface across compatible providers.
 
-### 🎯 5-Strategy DOM Detection Pipeline
+### 5-Strategy DOM Detection Pipeline
 
 Uses multiple detection strategies to handle LinkedIn's dynamic UI:
 
@@ -33,7 +33,7 @@ Uses multiple detection strategies to handle LinkedIn's dynamic UI:
 
 This makes the automation more resilient to changes in page structure and element positioning.
 
-### 📝 Intelligent Multi-Step Form Automation
+### Intelligent Multi-Step Form Automation
 
 * Traverses multi-page Easy Apply forms.
 * Automatically fills text fields.
@@ -41,7 +41,7 @@ This makes the automation more resilient to changes in page structure and elemen
 * Uses LLM-generated responses for custom open-ended questions.
 * Maintains application state while navigating through form steps.
 
-### 🛡️ Resilient Browser Automation
+### Resilient Browser Automation
 
 * Browser lifecycle validation using session/browser health checks.
 * Handles dynamically rendered content through DOM hydration and scrolling.
@@ -50,7 +50,7 @@ This makes the automation more resilient to changes in page structure and elemen
 
 ---
 
-## 🏗️ Technical Architecture
+## Technical Architecture
 
 ```text
                          ┌──────────────────────┐
@@ -113,7 +113,7 @@ Skip Job   Open Easy Apply
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Category               | Technologies     |
 | ---------------------- | ---------------- |
@@ -129,7 +129,7 @@ Skip Job   Open Easy Apply
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 linkedin-job-agent/
@@ -153,7 +153,7 @@ linkedin-job-agent/
 
 ---
 
-## ⚙️ Setup & Installation
+## Setup & Installation
 
 ### 1. Clone the Repository
 
@@ -196,7 +196,7 @@ playwright install chromium
 
 ---
 
-## 🔑 Environment Configuration
+## Environment Configuration
 
 Create a `.env` file in the project root:
 
@@ -220,7 +220,7 @@ __pycache__/
 
 ---
 
-## 📄 Resume Configuration
+## Resume Configuration
 
 Place your resume PDF in the location expected by the project configuration.
 
@@ -228,7 +228,7 @@ The resume parser extracts relevant candidate information and converts it into a
 
 ---
 
-## 🚀 Running the Agent
+## Running the Agent
 
 Start the application with:
 
@@ -246,7 +246,7 @@ Application and skipped-job information can be persisted in the `data/` director
 
 ---
 
-## 🧩 LLM Provider Strategy
+## LLM Provider Strategy
 
 The project uses a fallback architecture to improve inference reliability:
 
@@ -276,7 +276,7 @@ This architecture allows the application to continue operating even when an indi
 
 ---
 
-## 🔐 Security Considerations
+## Security Considerations
 
 * Keep API credentials exclusively in environment variables.
 * Never commit `.env` to version control.
@@ -287,7 +287,7 @@ This architecture allows the application to continue operating even when an indi
 
 ---
 
-## 🚧 Current Limitations
+## Current Limitations
 
 * LinkedIn's UI and DOM structure can change without notice.
 * Some applications contain custom questions or workflows that require additional handling.
@@ -297,7 +297,7 @@ This architecture allows the application to continue operating even when an indi
 
 ---
 
-## 🔮 Future Improvements
+## Future Improvements
 
 * [ ] Job deduplication and intelligent prioritization
 * [ ] Configurable job search profiles
@@ -311,7 +311,7 @@ This architecture allows the application to continue operating even when an indi
 
 ---
 
-## 📊 Engineering Highlights
+## Engineering Highlights
 
 This project demonstrates practical implementation of:
 
@@ -326,7 +326,7 @@ This project demonstrates practical implementation of:
 
 ---
 
-## ⭐ Contributing
+## Contributing
 
 Contributions, improvements, and ideas are welcome. Feel free to open an issue or submit a pull request.
 
