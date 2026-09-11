@@ -1,6 +1,6 @@
 """
 Easy Apply Screening Questions & Answers Knowledge Base
-Contains answers to all 57 standard screening categories.
+Contains answers to all standard screening categories.
 """
 
 from datetime import datetime, timedelta
@@ -38,19 +38,17 @@ def get_default_answers() -> dict:
         "notice_period_days": "0",
         "start_date": one_week_later,
         "current_salary": "0",
-        "expected_salary_text": "6 LPA",
+        "expected_salary_text": "600000",
         "expected_salary_numeric": "600000",
         "experience_numeric": "0",
-        "experience_text": "1 year",
     })
     return data
 
 
 def resolve_text_input(label_text: str, input_type: str = "text", profile: Any = None, job: Any = None) -> str:
     """Matches text, numeric, and textarea input labels to specific QA rules."""
-    text = label_text.lower()
+    text = label_text.lower().strip()
     defaults = get_default_answers()
-    is_numeric = (input_type == "number")
 
     # 1. Contact & Identity Information
     if any(k in text for k in ["phone", "mobile", "contact"]):
@@ -70,19 +68,19 @@ def resolve_text_input(label_text: str, input_type: str = "text", profile: Any =
     if any(k in text for k in ["field of study", "major", "what did you study"]):
         return defaults["field_of_study"]
 
-    # 3. Work Experience & Skills
-    if any(k in text for k in ["experience", "years"]):
-        return defaults["experience_numeric"] if is_numeric else defaults["experience_text"]
+    # 3. Work Experience & Skills Questions (STRICTLY NUMERIC ONLY)
+    if any(k in text for k in ["experience", "years", "how many years"]):
+        return defaults["experience_numeric"]
 
     # 4. Compensation / CTC
     if "current" in text and any(k in text for k in ["salary", "ctc", "pay", "compensation"]):
         return defaults["current_salary"]
     if any(k in text for k in ["expected", "desired", "requirement"]) and any(k in text for k in ["salary", "ctc", "pay", "compensation"]):
-        return defaults["expected_salary_numeric"] if is_numeric else defaults["expected_salary_text"]
+        return defaults["expected_salary_numeric"]
 
     # 5. Availability & Start Date
     if any(k in text for k in ["notice", "how soon"]):
-        return defaults["notice_period_days"] if is_numeric else defaults["notice_period_text"]
+        return defaults["notice_period_days"]
     if any(k in text for k in ["start", "joining date", "available"]):
         return defaults["start_date"]
 
@@ -94,21 +92,13 @@ def resolve_text_input(label_text: str, input_type: str = "text", profile: Any =
     if "why" in text and "interested" in text:
         return defaults["why_interested"]
 
-    # Fallback default
-    return defaults["experience_numeric"] if is_numeric else defaults["experience_text"]
+    # Return empty string for unhandled questions to trigger unanswered question logging
+    return ""
 
 
 def resolve_radio_selection(legend_text: str) -> str:
-    """
-    Determines whether to select 'Yes' or 'No' for radio groups/fieldsets.
-    
-    Rule Matrix:
-    - Higher Degree Requirements (Master's, Ph.D.): NO
-    - Non-India Authorization: NO
-    - Sponsorship, Relocation, Commute, Evening/Night/Weekend Shifts, 
-      Background Checks, References, Team Experience, Specific Skills: YES
-    """
-    text = legend_text.lower()
+    """Determines whether to select 'Yes' or 'No' for radio groups/fieldsets."""
+    text = legend_text.lower().strip()
 
     # 1. Higher Education Checks
     if any(k in text for k in ["master", "doctorate", "phd", "post graduate"]):
@@ -127,9 +117,9 @@ def resolve_radio_selection(legend_text: str) -> str:
         "full-time", "completed", "team", "agile", "experience", "proficient", "fluent",
         "english", "hindi", "python", "javascript", "react", "node", "rest api", "postgresql",
         "mongodb", "fastapi", "llm", "prompt", "rag", "agents", "pytorch", "tensorflow",
-        "hugging face", "inference", "production", "certification", "aws"
+        "hugging face", "inference", "production", "certification", "aws", "claude", "ibm"
     ]):
         return "Yes"
 
-    # General Fallback
-    return "Yes"
+    # Return empty string if question is unrecognized
+    return ""

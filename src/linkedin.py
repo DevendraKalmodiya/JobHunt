@@ -1,13 +1,16 @@
 import time
+import json
 import logging
+from datetime import datetime
 from typing import List, Optional, Any, Dict
 from src.jobs import Job
 from src.qa_rules import resolve_text_input, resolve_radio_selection
 
 
 class LinkedInEngine:
-    def __init__(self, page: Any):
+    def __init__(self, page: Any, unanswered_log_path: str = "data/unanswered_questions.json"):
         self.page = page
+        self.unanswered_log_path = unanswered_log_path
 
     # ==========================================
     # PHASE 5: BROWSER/CONTEXT LIFECYCLE GUARDS
@@ -34,6 +37,31 @@ class LinkedInEngine:
         except Exception as e:
             logging.error(f"Failed session validation: {e}")
             return False
+
+    def log_unanswered_question(self, job: Job, question_text: str):
+        """Logs unknown questions to data/unanswered_questions.json."""
+        try:
+            entry = {
+                "job_title": job.title,
+                "company": job.company,
+                "apply_link": job.url,
+                "question": question_text,
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            records = []
+            try:
+                with open(self.unanswered_log_path, "r", encoding="utf-8") as f:
+                    records = json.load(f)
+            except Exception:
+                records = []
+
+            # Avoid duplicate logs for the same job & question
+            if not any(r.get("apply_link") == job.url and r.get("question") == question_text for r in records):
+                records.append(entry)
+                with open(self.unanswered_log_path, "w", encoding="utf-8") as f:
+                    json.dump(records, f, indent=4)
+        except Exception as e:
+            print(f"  [-] Failed logging unanswered question: {e}")
 
     # ==========================================
     # PHASE 1: LINKEDIN PAGE LOADING & HARVESTING
@@ -314,6 +342,9 @@ class LinkedInEngine:
                 if not self.is_browser_alive():
                     return False
 
+                unhandled_question_found = False
+                unhandled_prompt_text = ""
+
                 # --- STEP A: FILL ALL CURRENT PAGE INPUTS ---
 
                 # 1. Fill Text, Numeric, and Textarea Inputs via qa_rules
@@ -325,20 +356,26 @@ class LinkedInEngine:
                     ).all()
 
                     for inp in inputs:
-                        if inp.is_visible() and not inp.input_value():
+                        if inp.is_visible():
                             label_text = ""
                             input_type = inp.get_attribute("type") or "text"
                             try:
                                 label_el = self.page.locator(f"label[for='{inp.get_attribute('id')}']").first
                                 if label_el.is_visible():
-                                    label_text = label_el.inner_text()
+                                    label_text = label_el.inner_text().strip()
                             except Exception:
                                 pass
 
                             # Delegate answer lookup to external QA rules engine
                             answer = resolve_text_input(label_text, input_type=input_type, profile=profile, job=job)
-                            inp.fill(str(answer))
-                            time.sleep(0.3)
+                            
+                            if not answer:
+                                unhandled_question_found = True
+                                unhandled_prompt_text = label_text or "Text Input Field"
+                            else:
+                                inp.fill("")
+                                inp.fill(str(answer))
+                                time.sleep(0.3)
                 except Exception:
                     pass
 
@@ -353,21 +390,23 @@ class LinkedInEngine:
                                 try:
                                     legend_el = fs.locator("legend").first
                                     if legend_el.is_visible():
-                                        legend_text = legend_el.inner_text()
+                                        legend_text = legend_el.inner_text().strip()
                                 except Exception:
                                     pass
 
                                 # Determine target choice via qa_rules
                                 preferred_choice = resolve_radio_selection(legend_text)
-                                target_opt = fs.locator(f"label:has-text('{preferred_choice}'), input[value='{preferred_choice}']").first
-
-                                if target_opt.is_visible():
-                                    target_opt.click()
+                                if not preferred_choice:
+                                    unhandled_question_found = True
+                                    unhandled_prompt_text = legend_text or "Radio Selection Fieldset"
                                 else:
-                                    # Fallback to first available radio option
-                                    first_opt = fs.locator("label, input[type='radio']").first
-                                    if first_opt.is_visible():
-                                        first_opt.click()
+                                    target_opt = fs.locator(f"label:has-text('{preferred_choice}'), input[value='{preferred_choice}']").first
+                                    if target_opt.is_visible():
+                                        target_opt.click()
+                                    else:
+                                        first_opt = fs.locator("label, input[type='radio']").first
+                                        if first_opt.is_visible():
+                                            first_opt.click()
                                 time.sleep(0.3)
                 except Exception:
                     pass
@@ -383,10 +422,37 @@ class LinkedInEngine:
                                 if val:
                                     sel.select_option(value=val)
                                     time.sleep(0.3)
+                                else:
+                                    unhandled_question_found = True
+                                    unhandled_prompt_text = "Select Dropdown Field"
                 except Exception:
                     pass
 
-                # --- STEP B: CHECK FOR SUBMISSION / NAVIGATION BUTTONS ---
+                # --- STEP B: CHECK FOR UNHANDLED QUESTIONS & MANUAL WAIT ---
+                if unhandled_question_found:
+                    print(f"\n  [!] UNKNOWN QUESTION ENCOUNTERED: '{unhandled_prompt_text}'")
+                    print("  [!] Logging question to data/unanswered_questions.json")
+                    self.log_unanswered_question(job, unhandled_prompt_text)
+
+                    print("  [⏳] WAITING 10 SECONDS FOR MANUAL INPUT IN BROWSER...")
+                    time.sleep(10)
+
+                    next_btn_check = self.page.locator(
+                        "button:has-text('Next'), button:has-text('Continue to application'), button:has-text('Review'), button:has-text('Submit application')"
+                    ).first
+                    
+                    if not (next_btn_check.is_visible() and next_btn_check.is_enabled()):
+                        print("  [-] No manual input detected within 10 seconds. Skipping job.")
+                        dismiss_btn = self.page.locator("button[aria-label='Dismiss'], button:has-text('Cancel')").first
+                        if dismiss_btn.is_visible():
+                            dismiss_btn.click()
+                            time.sleep(1)
+                            discard_btn = self.page.locator("button:has-text('Discard')").first
+                            if discard_btn.is_visible():
+                                discard_btn.click()
+                        return False
+
+                # --- STEP C: CHECK FOR SUBMISSION / NAVIGATION BUTTONS ---
 
                 # 1. Check for Final "Submit Application" Button FIRST
                 submit_btn = self.page.locator("button:has-text('Submit application'), button:has-text('Submit')").first
