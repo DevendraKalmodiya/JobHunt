@@ -2,6 +2,7 @@ import time
 import logging
 from typing import List, Optional, Any, Dict
 from src.jobs import Job
+from src.qa_rules import resolve_text_input, resolve_radio_selection
 
 
 class LinkedInEngine:
@@ -218,7 +219,6 @@ class LinkedInEngine:
             except Exception as e:
                 print(f"  [-] Diagnostics gathering warning: {e}")
 
-        # Comprehensive selectors targeting both <button> and <a> tag implementations
         easy_apply_selectors = [
             "button:has-text('Easy Apply')",
             "a[aria-label*='Easy Apply']",
@@ -315,44 +315,56 @@ class LinkedInEngine:
                     return False
 
                 # --- STEP A: FILL ALL CURRENT PAGE INPUTS ---
-                
-                # 1. Fill Text, Numeric, and Textarea Inputs
+
+                # 1. Fill Text, Numeric, and Textarea Inputs via qa_rules
                 try:
-                    inputs = self.page.locator("div.jobs-easy-apply-modal input[type='text'], div.jobs-easy-apply-modal input[type='number'], div.jobs-easy-apply-modal textarea").all()
+                    inputs = self.page.locator(
+                        "div.jobs-easy-apply-modal input[type='text'], "
+                        "div.jobs-easy-apply-modal input[type='number'], "
+                        "div.jobs-easy-apply-modal textarea"
+                    ).all()
+
                     for inp in inputs:
                         if inp.is_visible() and not inp.input_value():
                             label_text = ""
+                            input_type = inp.get_attribute("type") or "text"
                             try:
                                 label_el = self.page.locator(f"label[for='{inp.get_attribute('id')}']").first
                                 if label_el.is_visible():
                                     label_text = label_el.inner_text()
                             except Exception:
                                 pass
-                            
-                            answer = "1"
-                            if any(k in label_text.lower() for k in ["mobile", "phone"]):
-                                answer = getattr(profile, 'phone', '9876543210')
-                            elif any(k in label_text.lower() for k in ["experience", "years"]):
-                                answer = "1"
-                            elif label_text:
-                                answer = gemini.generate_application_answer(label_text, profile, job) or "1"
 
+                            # Delegate answer lookup to external QA rules engine
+                            answer = resolve_text_input(label_text, input_type=input_type, profile=profile, job=job)
                             inp.fill(str(answer))
                             time.sleep(0.3)
                 except Exception:
                     pass
 
-                # 2. Handle Unselected Radio Button Groups
+                # 2. Handle Radio Button Groups via qa_rules
                 try:
                     fieldset_els = self.page.locator("div.jobs-easy-apply-modal fieldset").all()
                     for fs in fieldset_els:
                         if fs.is_visible():
                             checked = fs.locator("input[type='radio']:checked").count()
                             if checked == 0:
-                                yes_opt = fs.locator("label:has-text('Yes'), input[value='Yes']").first
-                                if yes_opt.is_visible():
-                                    yes_opt.click()
+                                legend_text = ""
+                                try:
+                                    legend_el = fs.locator("legend").first
+                                    if legend_el.is_visible():
+                                        legend_text = legend_el.inner_text()
+                                except Exception:
+                                    pass
+
+                                # Determine target choice via qa_rules
+                                preferred_choice = resolve_radio_selection(legend_text)
+                                target_opt = fs.locator(f"label:has-text('{preferred_choice}'), input[value='{preferred_choice}']").first
+
+                                if target_opt.is_visible():
+                                    target_opt.click()
                                 else:
+                                    # Fallback to first available radio option
                                     first_opt = fs.locator("label, input[type='radio']").first
                                     if first_opt.is_visible():
                                         first_opt.click()
@@ -360,7 +372,7 @@ class LinkedInEngine:
                 except Exception:
                     pass
 
-                # 3. Handle Unselected Dropdowns
+                # 3. Handle Select Dropdowns
                 try:
                     selects = self.page.locator("div.jobs-easy-apply-modal select").all()
                     for sel in selects:
@@ -382,8 +394,7 @@ class LinkedInEngine:
                     submit_btn.click()
                     time.sleep(3)
                     application_submitted = True
-                    
-                    # Dismiss final post-submit dialog if present
+
                     dismiss_btn = self.page.locator("button[aria-label='Dismiss'], button:has-text('Done'), a:has-text('Done')").first
                     if dismiss_btn.is_visible():
                         dismiss_btn.click()
@@ -396,7 +407,6 @@ class LinkedInEngine:
                     time.sleep(2.5)  # Wait for next page DOM to render
                     continue
 
-                # 3. If modal closed unexpectedly or no navigation button is active, wait brief moment
                 time.sleep(1)
 
             return application_submitted
